@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
-import { firebaseAuth } from "../firebase/config";
+import { firebaseAuth, firestore } from "../firebase/config";
 import { useAuthContext } from "./useAuthContext";
 
 export const useLogin = () => {
   const [isCancelled, setIsCancelled] = useState(false);
   const [error, setError] = useState(null);
-  const [isPending, setIsPending] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { dispatch } = useAuthContext();
 
   const login = async (email, password) => {
     setError(null);
-    setIsPending(true);
+    setLoading(true);
 
     try {
       // login
@@ -19,17 +19,22 @@ export const useLogin = () => {
         password
       );
 
+      // change user online status
+      await firestore.collection("users").doc(res.user.uid).update({
+        online: true,
+      });
+
       // dispatch login action
       dispatch({ type: "LOGIN", payload: res.user });
 
       if (!isCancelled) {
-        setIsPending(false);
+        setLoading(false);
         setError(null);
       }
     } catch (err) {
       if (!isCancelled) {
         setError(err.message);
-        setIsPending(false);
+        setLoading(false);
       }
     }
   };
@@ -38,5 +43,5 @@ export const useLogin = () => {
     return () => setIsCancelled(true);
   }, []);
 
-  return { login, isPending, error };
+  return { login, loading, error };
 };

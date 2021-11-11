@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { firebaseAuth, firebaseStorage } from "../firebase/config";
+import { firebaseAuth, firebaseStorage, firestore } from "../firebase/config";
 import { useAuthContext } from "./useAuthContext";
 
 export const useSignup = () => {
@@ -30,6 +30,13 @@ export const useSignup = () => {
 
       // add display name to user
       await res.user.updateProfile({ displayName, photoURL: imgUrl });
+
+      // create a user document
+      await firestore.collection("users").doc(res.user.uid).set({
+        online: true,
+        displayName,
+        photoURL: imgUrl, 
+      });
 
       // dispatch login action
       dispatch({ type: "LOGIN", payload: res.user });
