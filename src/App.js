@@ -9,6 +9,7 @@ import Signup from "./pages/signup/Signup";
 import Create from "./pages/create/Create";
 import Navbar from "./components/navbar/Navbar";
 import Sidebar from "./components/sidebar/Sidebar";
+import OnlineUsers from "./components/onlineUsers/OnlineUsers";
 
 // styles
 import "./App.css";
@@ -20,7 +21,7 @@ function App() {
     <div className="App">
       {authIsReady && (
         <BrowserRouter>
-          <Sidebar />
+          {user && <Sidebar />}
           <div className="container">
             <Navbar />
             <Switch>
@@ -32,7 +33,7 @@ function App() {
                 {!user && <Redirect to="/login" />}
                 {user && <Create />}
               </Route>
-              <Route path="/project/:id">
+              <Route path="/projects/:id">
                 {!user && <Redirect to="/login" />}
                 {user && <Project />}
               </Route>
@@ -46,6 +47,7 @@ function App() {
               </Route>
             </Switch>
           </div>
+          {user && <OnlineUsers />}
         </BrowserRouter>
       )}
     </div>
